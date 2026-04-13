@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/_head') %>
+    <title>Admin — Tailwind Preview</title>
+    <meta name="csrf-token" content="<%= csrfToken %>">
+  </head>
+
+  <body class="bg-surface-50 text-surface-700 min-h-screen flex flex-col antialiased">
+
+    <header class="flex items-center justify-between px-5 py-3 border-b border-surface-200 bg-white shadow-sm">
+
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 flex items-center justify-center rounded-lg bg-brand-600 shadow shadow-brand-600/20">
+          <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"
+            />
+          </svg>
+        </div>
+
+        <span class="text-sm font-semibold text-surface-800">
+          Tailwind Preview
+        </span>
+
+        <div class="w-px h-4 bg-surface-200"></div>
+
+        <span class="text-sm text-surface-400">Admin</span>
+
+        <a
+          href="/"
+          target="_blank"
+          class="px-3 py-1.5 text-xs font-medium rounded-lg bg-brand-50 text-brand-600 hover:bg-brand-100 hover:text-brand-700 transition"
+        >
+          View Site &nearr;
+        </a>
+      </div>
+
+      <form method="post" action="/admin/logout">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+        <button
+          type="submit"
+          class="px-3 py-1.5 text-sm font-medium rounded-lg text-surface-500 hover:text-surface-700 hover:bg-surface-100 transition"
+        >
+          Sign out
+        </button>
+      </form>
+    </header>
+
+    <main class="flex-1 w-full max-w-6xl mx-auto p-6">
+
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-surface-800">Pastes</h2>
+        <span id="paste-count" class="text-sm text-surface-400">
+          <%= total %> total
+        </span>
+      </div>
+
+      <% if (pastes.length === 0) { %>
+
+        <div class="bg-white border border-surface-200 rounded-2xl shadow-xl shadow-surface-200/50 p-16 text-center">
+          <p class="text-sm text-surface-400">No pastes yet.</p>
+        </div>
+
+      <% } else { %>
+
+        <div class="bg-white border border-surface-200 rounded-2xl shadow-xl shadow-surface-200/50 overflow-hidden">
+          <table class="w-full text-sm">
+
+            <thead>
+              <tr class="border-b border-surface-100 text-left">
+                <th class="px-5 py-3 font-semibold text-surface-500">Key</th>
+                <th class="px-5 py-3 font-semibold text-surface-500">Lines</th>
+                <th class="px-5 py-3 font-semibold text-surface-500">Size</th>
+                <th class="px-5 py-3 font-semibold text-surface-500">TTL</th>
+                <th class="px-5 py-3 font-semibold text-surface-500">Created</th>
+                <th class="px-5 py-3 font-semibold text-surface-500 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% pastes.forEach((paste) => { %>
+                <tr
+                  class="border-b border-surface-100 last:border-0 hover:bg-surface-50 transition"
+                  data-row-id="<%= paste.id %>"
+                >
+                  <td class="px-5 py-3 font-mono text-brand-600">
+                    <a
+                      href="/tailwind/<%= paste.key %>"
+                      target="_blank"
+                      class="hover:underline"
+                    >
+                      <%= paste.key %>
+                    </a>
+                  </td>
+
+                  <td class="px-5 py-3 text-surface-500">
+                    <%= paste.lineCount %>
+                  </td>
+
+                  <td class="px-5 py-3 text-surface-500">
+                    <%= paste.sizeText %>
+                  </td>
+
+                  <td class="px-5 py-3 text-surface-500 <%= paste.isExpired ? 'text-red-400' : '' %>">
+                    <%= paste.ttlText %>
+                  </td>
+
+                  <td class="px-5 py-3 text-surface-400">
+                    <%= paste.createdAtText %>
+                  </td>
+
+                  <td class="px-5 py-3 text-right">
+                    <div class="inline-flex items-center gap-2">
+
+                      <a
+                        href="/tailwind/<%= paste.key %>"
+                        target="_blank"
+                        class="px-3 py-1.5 text-xs font-medium rounded-lg text-surface-500 hover:text-surface-700 hover:bg-surface-100 transition"
+                      >
+                        View
+                      </a>
+
+                      <button
+                        type="button"
+                        class="delete-btn px-3 py-1.5 text-xs font-medium rounded-lg text-red-500 hover:text-red-700 hover:bg-red-50 transition"
+                        data-id="<%= paste.id %>"
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+
+          </table>
+        </div>
+
+        <% if (totalPages > 1) { %>
+          <div class="flex items-center justify-between mt-5">
+
+            <% if (page > 1) { %>
+              <a
+                href="/admin?page=<%= page - 1 %>"
+                class="px-4 py-2 text-sm font-medium rounded-lg border border-surface-200 text-surface-500 hover:text-surface-700 hover:bg-white transition"
+              >
+                &larr; Previous
+              </a>
+            <% } else { %>
+              <span></span>
+            <% } %>
+
+            <span class="text-sm text-surface-400">
+              Page <%= page %> of <%= totalPages %>
+            </span>
+
+            <% if (page < totalPages) { %>
+              <a
+                href="/admin?page=<%= page + 1 %>"
+                class="px-4 py-2 text-sm font-medium rounded-lg border border-surface-200 text-surface-500 hover:text-surface-700 hover:bg-white transition"
+              >
+                Next &rarr;
+              </a>
+            <% } else { %>
+              <span></span>
+            <% } %>
+
+          </div>
+        <% } %>
+
+      <% } %>
+    </main>
+
+    <template id="empty-state-tpl">
+      <div class="bg-white border border-surface-200 rounded-2xl shadow-xl shadow-surface-200/50 p-16 text-center">
+        <p class="text-sm text-surface-400">No pastes yet.</p>
+      </div>
+    </template>
+
+    <script src="/js/admin.js"></script>
+  </body>
+</html>
