@@ -72,7 +72,7 @@ module.exports = Object.freeze({
 
   IS_PRODUCTION: process.env.NODE_ENV === "production",
 
-  MAX_CONTENT_BYTES: 100_000,
+  MAX_CONTENT_BYTES: 700_000,
   CLEANUP_INTERVAL_MS: 60 * 60 * 1000,
   GRACEFUL_SHUTDOWN_MS: 5_000,
 
