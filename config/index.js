@@ -4,50 +4,18 @@
 
 require("dotenv").config();
 
+const {
+  requirePositiveInt,
+  requireString,
+  requireEnvString,
+} = require("./env");
+
 const DAY_IN_SECONDS = 86_400;
 
 const YEAR_IN_SECONDS = 365 * DAY_IN_SECONDS;
 
 const EXPIRY_YEARS = 1;
 const EXPIRY_MS = YEAR_IN_SECONDS * EXPIRY_YEARS * 1000;
-
-const requirePositiveInt = (name, fallback) => {
-  const raw = process.env[name];
-  if (raw === undefined || raw === "") return fallback;
-
-  const parsed = Number(raw);
-
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    throw new Error(
-      `Invalid configuration: ${name}="${raw}" must be a positive integer`
-    );
-  }
-  return parsed;
-};
-
-const requireString = (name, fallback) => {
-  const raw = process.env[name];
-  if (raw === undefined || raw === "") return fallback;
-
-  const trimmed = raw.trim();
-  if (!trimmed) {
-    throw new Error(
-      `Invalid configuration: ${name} must be a non-empty string`
-    );
-  }
-  return trimmed;
-};
-
-const requireEnvString = (name, hint = "") => {
-  const s = process.env[name]?.trim();
-  if (!s) {
-    const extra = hint ? ` ${hint}` : "";
-    throw new Error(
-      `${name} must be set in your environment (e.g. in .env).${extra}`
-    );
-  }
-  return s;
-};
 
 const PORT = requirePositiveInt("PORT", 3000);
 const BIND_IP = requireString("IP_ADDRESS", "127.0.0.1");
